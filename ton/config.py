@@ -5,7 +5,7 @@ SECRET_KEY = '384509348'
 # Flask-Security config
 SECURITY_URL_PREFIX = "/admin"
 SECURITY_PASSWORD_HASH = "pbkdf2_sha512"
-SECURITY_PASSWORD_SALT = "ATGUOHAELKiubahiughaerGOJAEGj"
+SECURITY_PASSWORD_SALT = "VT37z1fKuEpc06Nlmkj0E32B7PWo"
 
 # Flask-Security URLs, overridden because they don't put a / at the end
 SECURITY_LOGIN_URL = "/login/"

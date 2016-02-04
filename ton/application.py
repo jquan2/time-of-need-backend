@@ -49,7 +49,7 @@ class MyModelView(sqla.ModelView):
 
 
 # Setup Flask-Admin
-admin = Admin(app, name='Time of Need Admin', template_mode='bootstrap3')
+admin = Admin(app, name='Time of Need Admin', template_mode='bootstrap3', base_template='my_master.html')
 admin.add_view(MyModelView(User, db.session))
 admin.add_view(MyModelView(Location, db.session))
 admin.add_view(MyModelView(Service, db.session))
