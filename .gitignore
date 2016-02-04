@@ -60,3 +60,10 @@ target/
 
 #Ipython Notebook
 .ipynb_checkpoints
+
+#Database
+*.db
+
+#Pycharm
+.idea/
+venv/
