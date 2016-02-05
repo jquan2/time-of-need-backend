@@ -5,8 +5,8 @@ from flask_admin.contrib import sqla
 from flask_admin.contrib.sqla import ModelView
 from flask_security import current_user, Security, SQLAlchemyUserDatastore
 from flask_sqlalchemy import SQLAlchemy
-from models import db
-from models import User, Role, Location, Service
+from .models import db
+from .models import User, Role, Location, Service
 
 app = Flask(__name__)
 app.config.from_pyfile('config.py')
