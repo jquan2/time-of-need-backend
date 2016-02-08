@@ -1,4 +1,5 @@
 from flask import Flask, abort, redirect, url_for, request, render_template
+from flask.ext import restful
 from flask_admin import Admin
 from flask_admin import helpers as admin_helpers
 from flask_admin.contrib import sqla
@@ -12,6 +13,10 @@ app = Flask(__name__)
 app.config.from_pyfile('config.py')
 db.init_app(app)
 app.db = db
+
+# Setup api
+app.api = restful.Api(app)
+from ton import api
 
 # Flask views
 @app.route('/')

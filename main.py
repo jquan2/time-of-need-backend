@@ -21,10 +21,7 @@ def initialize_db():
     app.db.create_all()
     admin_role = Role(name='Administrator')
     app.db.session.add(admin_role)
-    admin = User('admin', 'admin@example.com')
-    admin.password = 'supersecret'
-    admin.roles = [admin_role]
-    admin.active = True
+    admin = User(username='admin', email='admin@example.com', password='supersecret', roles=[admin_role], active=True)
     app.db.session.add(admin)
     app.db.session.commit()
 
