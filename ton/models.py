@@ -56,3 +56,6 @@ class Location(db.Model):
     zip = db.Column(db.String(5))
     services = db.relationship('Service', secondary=services_locations,
                                backref=db.backref('locations', lazy='dynamic'))
+
+    def __str__(self):
+        return "{zip}: {name}".format(name=self.name, zip=self.zip)
