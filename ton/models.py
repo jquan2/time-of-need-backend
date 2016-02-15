@@ -1,5 +1,6 @@
-from flask_sqlalchemy import SQLAlchemy
 from flask_security import RoleMixin, UserMixin
+
+from flask_sqlalchemy import SQLAlchemy
 
 db = SQLAlchemy()
 
@@ -54,4 +55,4 @@ class Location(db.Model):
     name = db.Column(db.String(80), unique=True)
     zip = db.Column(db.String(5))
     services = db.relationship('Service', secondary=services_locations,
-                            backref=db.backref('locations', lazy='dynamic'))
+                               backref=db.backref('locations', lazy='dynamic'))
