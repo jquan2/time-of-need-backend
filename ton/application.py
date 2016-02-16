@@ -55,8 +55,8 @@ class MyModelView(sqla.ModelView):
 # Setup Flask-Admin
 admin = Admin(app, name='Time of Need Admin', template_mode='bootstrap3',
               base_template='my_master.html')
-admin.add_view(MyModelView(Location, db.session))
-admin.add_view(MyModelView(Service, db.session))
+admin.add_view(MyModelView(Location, db.session, name="Locations"))
+admin.add_view(MyModelView(Service, db.session, name="Services"))
 
 
 # Define a context processor for merging flask-admin's template context into
