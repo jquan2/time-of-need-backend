@@ -67,3 +67,7 @@ target/
 #Pycharm
 .idea/
 venv/
+
+# ERD
+schema.dot
+schema.png
