@@ -37,8 +37,15 @@ services_locations = db.Table(
 )
 
 
+locations_zipcodes = db.Table(
+    'locations_zipcodes',
+    db.Column('location_id', db.Integer(), db.ForeignKey('location.id')),
+    db.Column('zipcode_id', db.Integer(), db.ForeignKey('zip_code.id'))
+)
+
+
 class City(db.Model):
-    __tablename__ = 'cities'
+    __tablename__ = 'city'
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(80), unique=True)
     zip_codes = db.relationship("Zipcode", order_by="Zipcode.id",
@@ -49,10 +56,10 @@ class City(db.Model):
 
 
 class Zipcode(db.Model):
-    __tablename__ = 'zip_codes'
+    __tablename__ = 'zip_code'
     id = db.Column(db.Integer, primary_key=True)
     zip = db.Column(db.String(5), unique=True)
-    city_id = db.Column(db.Integer, db.ForeignKey('cities.id'))
+    city_id = db.Column(db.Integer, db.ForeignKey('city.id'))
     city = db.relationship("City", back_populates="zip_codes")
 
     def __str__(self):
@@ -75,9 +82,14 @@ class User(db.Model, UserMixin):
 class Location(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(80), unique=True)
-    zip = db.Column(db.String(5))
+    address = db.Column(db.String(80))
+    phone = db.Column(db.String(30))
+    website = db.Column(db.String(256))
     services = db.relationship('Service', secondary=services_locations,
                                backref=db.backref('locations', lazy='dynamic'))
+    zip_codes = db.relationship(
+        'Zipcode', secondary=locations_zipcodes,
+        backref=db.backref('locations', lazy='dynamic'))
 
     def __str__(self):
-        return "{zip}: {name}".format(name=self.name, zip=self.zip)
+        return self.name
