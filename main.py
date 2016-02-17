@@ -1,7 +1,10 @@
+import os
+from subprocess import call
+
 from flask.ext.script import Manager, Server
 
+from ton import models
 from ton.application import app
-from ton.models import Role, User
 
 manager = Manager(app)
 server = Server(
@@ -19,9 +22,9 @@ def initialize_db():
     app.db.create_all()
 
     # Add roles
-    admin_role = Role(name='Administrator')
+    admin_role = models.Role(name='Administrator')
     app.db.session.add(admin_role)
-    admin = User(
+    admin = models.User(
         username='admin',
         email='admin@example.com',
         password='supersecret',
@@ -33,6 +36,26 @@ def initialize_db():
     app.db.session.commit()
 
 manager.add_command('runserver', server)
+
+
+@manager.command
+def generate_erd():
+    """
+    Generate UML that represents an ERD
+
+    Command wrapper for sadisplay. Must have graphviz installed.
+    See https://bitbucket.org/estin/sadisplay/wiki/Home
+    """
+    import sadisplay
+    from ton import models
+
+    desc = sadisplay.describe([getattr(models, attr) for attr in dir(models)])
+    with open('schema.dot', 'w') as f:
+        f.write(sadisplay.dot(desc))
+    ret = call("dot -Tpng schema.dot > schema.png", shell=True)
+    if ret == 0:
+        os.remove("schema.dot")
+
 
 if __name__ == '__main__':
     manager.run()

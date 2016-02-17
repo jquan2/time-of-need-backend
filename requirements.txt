@@ -16,6 +16,7 @@ MarkupSafe==0.23
 passlib==1.6.5
 python-dateutil==2.4.2
 pytz==2015.7
+sadisplay==0.4.2
 six==1.10.0
 SQLAlchemy==1.0.11
 Werkzeug==0.11.3
