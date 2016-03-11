@@ -44,6 +44,21 @@ locations_zipcodes = db.Table(
 )
 
 
+locations_days_of_week = db.Table(
+    'locations_days_of_week',
+    db.Column('location_id', db.Integer(), db.ForeignKey('location.id')),
+    db.Column('day_of_week_id', db.Integer(), db.ForeignKey('day_of_week.id'))
+)
+
+
+class DayOfWeek(db.Model):
+    id = db.Column(db.Integer(), primary_key=True)
+    day = db.Column(db.String(10), unique=True)
+
+    def __str__(self):
+        return self.day
+
+
 class City(db.Model):
     __tablename__ = 'city'
     id = db.Column(db.Integer, primary_key=True)
@@ -92,6 +107,9 @@ class Location(db.Model):
     closing_time = db.Column(db.Time())
     zip_codes = db.relationship(
         'Zipcode', secondary=locations_zipcodes,
+        backref=db.backref('locations', lazy='dynamic'))
+    days_of_week = db.relationship(
+        'DayOfWeek', secondary=locations_days_of_week,
         backref=db.backref('locations', lazy='dynamic'))
 
     def __str__(self):
