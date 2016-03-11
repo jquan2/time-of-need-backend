@@ -88,6 +88,8 @@ class Location(db.Model):
     website = db.Column(db.String(256))
     services = db.relationship('Service', secondary=services_locations,
                                backref=db.backref('locations', lazy='dynamic'))
+    opening_time = db.Column(db.Time())
+    closing_time = db.Column(db.Time())
     zip_codes = db.relationship(
         'Zipcode', secondary=locations_zipcodes,
         backref=db.backref('locations', lazy='dynamic'))
