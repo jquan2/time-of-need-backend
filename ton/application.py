@@ -16,6 +16,8 @@ app.db = db
 
 # Setup api
 app.api = restful.Api(app)
+from .api import api_initialize
+api_initialize()
 
 
 @app.route('/')
