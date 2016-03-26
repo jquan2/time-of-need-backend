@@ -7,13 +7,13 @@ db = SQLAlchemy()
 # Authorization tables
 roles_users = db.Table(
     'roles_users',
-    db.Column('user_id', db.Integer(), db.ForeignKey('user.id')),
-    db.Column('role_id', db.Integer(), db.ForeignKey('role.id'))
+    db.Column('user_id', db.Integer, db.ForeignKey('user.id')),
+    db.Column('role_id', db.Integer, db.ForeignKey('role.id'))
 )
 
 
 class Role(db.Model, RoleMixin):
-    id = db.Column(db.Integer(), primary_key=True)
+    id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(80), unique=True)
     description = db.Column(db.String(255))
 
@@ -26,7 +26,7 @@ class User(db.Model, UserMixin):
     username = db.Column(db.String(80), unique=True)
     email = db.Column(db.String(120), unique=True)
     password = db.Column(db.String(255))
-    active = db.Column(db.Boolean())
+    active = db.Column(db.Boolean)
     roles = db.relationship('Role', secondary=roles_users,
                             backref=db.backref('users', lazy='dynamic'))
 
@@ -37,27 +37,27 @@ class User(db.Model, UserMixin):
 # Data tables
 locations_services = db.Table(
     'locations_services',
-    db.Column('location_id', db.Integer(), db.ForeignKey('location.id')),
-    db.Column('service_id', db.Integer(), db.ForeignKey('service.id'))
+    db.Column('location_id', db.Integer, db.ForeignKey('location.id')),
+    db.Column('service_id', db.Integer, db.ForeignKey('service.id'))
 )
 
 
 locations_zipcodes = db.Table(
     'locations_zipcodes',
-    db.Column('location_id', db.Integer(), db.ForeignKey('location.id')),
-    db.Column('zipcode_id', db.Integer(), db.ForeignKey('zip_code.id'))
+    db.Column('location_id', db.Integer, db.ForeignKey('location.id')),
+    db.Column('zipcode_id', db.Integer, db.ForeignKey('zip_code.id'))
 )
 
 
 locations_days_of_week = db.Table(
     'locations_days_of_week',
-    db.Column('location_id', db.Integer(), db.ForeignKey('location.id')),
-    db.Column('day_of_week_id', db.Integer(), db.ForeignKey('day_of_week.id'))
+    db.Column('location_id', db.Integer, db.ForeignKey('location.id')),
+    db.Column('day_of_week_id', db.Integer, db.ForeignKey('day_of_week.id'))
 )
 
 
 class Service(db.Model):
-    id = db.Column(db.Integer(), primary_key=True)
+    id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(40), unique=True)
     description = db.Column(db.String(255))
 
@@ -66,7 +66,7 @@ class Service(db.Model):
 
 
 class DayOfWeek(db.Model):
-    id = db.Column(db.Integer(), primary_key=True)
+    id = db.Column(db.Integer, primary_key=True)
     day = db.Column(db.String(10), unique=True)
 
     def __str__(self):
@@ -100,8 +100,8 @@ class Location(db.Model):
     phone = db.Column(db.String(30))
     contact_email = db.Column(db.String(256))
     website = db.Column(db.String(256))
-    opening_time = db.Column(db.Time())
-    closing_time = db.Column(db.Time())
+    opening_time = db.Column(db.Time)
+    closing_time = db.Column(db.Time)
     services = db.relationship(
         'Service', secondary=locations_services,
         backref=db.backref('locations', lazy='dynamic'))
