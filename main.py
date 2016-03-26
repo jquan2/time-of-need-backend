@@ -46,6 +46,10 @@ def initialize_db():
                 "Saturday", "Sunday"]:
         app.db.session.add(models.DayOfWeek(day=day))
 
+    # Currency
+    for currency in ["U.S. dollars"]:
+        app.db.session.add(models.Currency(currency=currency))
+
     # Save
     app.db.session.commit()
 

@@ -65,6 +65,15 @@ class City(db.Model):
         return self.name
 
 
+class Currency(db.Model):
+    __tablename__ = 'currency'
+    id = db.Column(db.Integer, primary_key=True)
+    currency = db.Column(db.String(80), unique=True)
+
+    def __str__(self):
+        return self.currency
+
+
 class DayOfWeek(db.Model):
     __tablename__ = 'day_of_week'
     id = db.Column(db.Integer, primary_key=True)
@@ -84,6 +93,9 @@ class Location(db.Model):
     website = db.Column(db.String(256))
     opening_time = db.Column(db.Time)
     closing_time = db.Column(db.Time)
+    currency_id = db.Column(db.Integer, db.ForeignKey('currency.id'))
+    currency = db.relationship('Currency', backref='locations')
+    min_cost = db.Column(db.Integer)
     days_of_week = db.relationship(
         'DayOfWeek', secondary=locations_days_of_week,
         backref=db.backref('locations', lazy='dynamic'))
