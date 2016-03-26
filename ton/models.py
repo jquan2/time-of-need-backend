@@ -57,6 +57,7 @@ locations_days_of_week = db.Table(
 
 
 class Service(db.Model):
+    __tablename__ = 'service'
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(40), unique=True)
     description = db.Column(db.String(255))
@@ -66,6 +67,7 @@ class Service(db.Model):
 
 
 class DayOfWeek(db.Model):
+    __tablename__ = 'day_of_week'
     id = db.Column(db.Integer, primary_key=True)
     day = db.Column(db.String(10), unique=True)
 
@@ -94,6 +96,7 @@ class Zipcode(db.Model):
 
 
 class Location(db.Model):
+    __tablename__ = 'location'
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(80), unique=True)
     address = db.Column(db.String(80))
@@ -102,14 +105,14 @@ class Location(db.Model):
     website = db.Column(db.String(256))
     opening_time = db.Column(db.Time)
     closing_time = db.Column(db.Time)
+    days_of_week = db.relationship(
+        'DayOfWeek', secondary=locations_days_of_week,
+        backref=db.backref('locations', lazy='dynamic'))
     services = db.relationship(
         'Service', secondary=locations_services,
         backref=db.backref('locations', lazy='dynamic'))
     zip_codes = db.relationship(
         'Zipcode', secondary=locations_zipcodes,
-        backref=db.backref('locations', lazy='dynamic'))
-    days_of_week = db.relationship(
-        'DayOfWeek', secondary=locations_days_of_week,
         backref=db.backref('locations', lazy='dynamic'))
 
     def __str__(self):
