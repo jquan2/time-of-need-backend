@@ -59,7 +59,7 @@ locations_days_of_week = db.Table(
 class City(db.Model):
     __tablename__ = 'city'
     id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(80), unique=True)
+    name = db.Column(db.String(80), nullable=False, unique=True)
 
     def __str__(self):
         return self.name
@@ -68,7 +68,7 @@ class City(db.Model):
 class DayOfWeek(db.Model):
     __tablename__ = 'day_of_week'
     id = db.Column(db.Integer, primary_key=True)
-    day = db.Column(db.String(10), unique=True)
+    day = db.Column(db.String(10), nullable=False, unique=True)
 
     def __str__(self):
         return self.day
@@ -77,7 +77,7 @@ class DayOfWeek(db.Model):
 class Location(db.Model):
     __tablename__ = 'location'
     id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(80), unique=True)
+    name = db.Column(db.String(80), nullable=False, unique=True)
     address = db.Column(db.String(80))
     phone = db.Column(db.String(30))
     contact_email = db.Column(db.String(256))
@@ -101,7 +101,7 @@ class Location(db.Model):
 class Service(db.Model):
     __tablename__ = 'service'
     id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(40), unique=True)
+    name = db.Column(db.String(40), nullable=False, unique=True)
     description = db.Column(db.String(255))
 
     def __str__(self):
@@ -111,7 +111,7 @@ class Service(db.Model):
 class Zipcode(db.Model):
     __tablename__ = 'zip_code'
     id = db.Column(db.Integer, primary_key=True)
-    zip = db.Column(db.String(5), unique=True)
+    zip = db.Column(db.String(5), nullable=False, unique=True)
     city_id = db.Column(db.Integer, db.ForeignKey('city.id'))
     city = db.relationship("City", backref="zip_codes")
 
