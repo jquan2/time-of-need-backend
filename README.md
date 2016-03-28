@@ -5,6 +5,8 @@ Infrastructure for the UAF-CS Spring 2016 Time Of Need project.
 ----
 
 
+[![Build Status](https://travis-ci.org/tjslauson/time-of-need-backend.svg?branch=master)](https://travis-ci.org/tjslauson/time-of-need-backend)
+
 ## Table of Contents
 
 * **[Installation](#installation)**
