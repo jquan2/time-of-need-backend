@@ -87,7 +87,9 @@ class Location(db.Model):
     __tablename__ = 'location'
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(80), nullable=False, unique=True)
-    address = db.Column(db.String(80))
+    address_line1 = db.Column(db.String(80))
+    address_line2 = db.Column(db.String(80))
+    address_line3 = db.Column(db.String(80))
     phone = db.Column(db.String(30))
     contact_email = db.Column(db.String(256))
     website = db.Column(db.String(256))
