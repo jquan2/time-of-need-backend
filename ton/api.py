@@ -17,43 +17,46 @@ class GetLocationsResource(Resource):
                 "name": location.name,
             }
 
-            if location.zip_codes != None:
+            if location.zip_codes is not None:
                 zipcodes_json = []
                 for zip in location.zip_codes:
                     zipcodes_json.append(str(zip))
 
-                loc["zipcodes"] = zipcodes_json
+                if len(zipcodes_json) > 0:
+                    loc["zipcodes"] = zipcodes_json
 
-            if location.services != None:
+            if location.services is not None:
                 services_json = []
                 for service in location.services:
                     services_json.append(str(service))
 
-                loc["services"] = services_json
+                if len(services_json) > 0:
+                    loc["services"] = services_json
 
-            if location.days_of_week != None:
+            if location.days_of_week is not None:
                 days_of_week_json = []
                 for day in location.days_of_week:
                     days_of_week_json.append(str(day))
 
-                loc["days"] = days_of_week_json
+                if len(days_of_week_json) > 0:
+                    loc["days"] = days_of_week_json
 
-            if location.address != None:
+            if location.address is not None:
                 loc["address"] = str(location.address)
 
-            if location.phone != None:
+            if location.phone is not None:
                 loc["phone"] = str(location.phone)
 
-            if location.contact_email != None:
+            if location.contact_email is not None:
                 loc["contact_email"] = str(location.contact_email)
 
-            if location.website != None:
+            if location.website is not None:
                 loc["website"] = str(location.website)
 
-            if location.opening_time != None:
+            if location.opening_time is not None:
                 loc["opening_time"] = str(location.opening_time)
 
-            if location.closing_time != None:
+            if location.closing_time is not None:
                 loc["closing_time"] = str(location.closing_time)
 
             locations_json.append(loc)
