@@ -87,6 +87,7 @@ class Location(db.Model):
     __tablename__ = 'location'
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(80), nullable=False, unique=True)
+    description = db.Column(db.String(255))
     address_line1 = db.Column(db.String(80))
     address_line2 = db.Column(db.String(80))
     address_line3 = db.Column(db.String(80))
@@ -116,7 +117,6 @@ class Service(db.Model):
     __tablename__ = 'service'
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(40), nullable=False, unique=True)
-    description = db.Column(db.String(255))
 
     def __str__(self):
         return self.name
