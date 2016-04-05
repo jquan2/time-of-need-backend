@@ -50,6 +50,17 @@ def initialize_db():
     for currency in ["U.S. dollars"]:
         app.db.session.add(models.Currency(currency=currency))
 
+    # Services
+    services = [
+        "Shelter", "Food", "Clothing Closets / Assistance Programs",
+        "Shower Facilities", "Support Groups", "Medical Facilities",
+        "Employment Assistance", "Transportation Assistance",
+        "Suicide Prevention", "Domestic Violence Resources",
+        "Veteran Services", "Referral Services"
+    ]
+    for s in services:
+        app.db.session.add(models.Service(name=s))
+
     # Save
     app.db.session.commit()
 
