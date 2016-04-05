@@ -59,6 +59,7 @@ class LocationModelView(SecureView):
     _form_columns = [
         "name",
         "services",
+        "description",
         "address_line1",
         "address_line2",
         "address_line3",
