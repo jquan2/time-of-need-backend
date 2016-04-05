@@ -7,7 +7,7 @@ from flask_admin.contrib import sqla
 
 from flask_security import SQLAlchemyUserDatastore, Security, current_user
 
-from .models import Location, Role, Service, User, db
+from .models import Location, Role, User, db
 
 app = Flask(__name__)
 app.config.from_pyfile('config.py')
@@ -57,7 +57,6 @@ class MyModelView(sqla.ModelView):
 # Setup Flask-Admin
 admin = Admin(app, name='Time of Need Admin', template_mode='bootstrap3',
               base_template='my_master.html')
-admin.add_view(MyModelView(Service, db.session, name="Services"))
 admin.add_view(MyModelView(Location, db.session, name="Locations"))
 
 
