@@ -30,7 +30,7 @@ security = Security(app, user_datastore)
 
 
 # Create customized model view class
-class MyModelView(sqla.ModelView):
+class SecureView(sqla.ModelView):
     def is_accessible(self):
         if not current_user.is_active or not current_user.is_authenticated:
             return False
@@ -54,10 +54,34 @@ class MyModelView(sqla.ModelView):
                 return redirect(url_for('security.login', next=request.url))
 
 
+class LocationModelView(SecureView):
+    _list_columns = ["name", "services"]
+    _form_columns = [
+        "name",
+        "address_line1",
+        "address_line2",
+        "address_line3",
+        "phone",
+        "contact_email",
+        "website",
+        "opening_time",
+        "closing_time",
+        "currency",
+        "min_cost",
+        "days_of_week",
+        "services",
+        "zip_codes",
+    ]
+
+    can_view_details = True
+    column_list = _list_columns  # List view
+    form_columns = _form_columns  # Form view
+
+
 # Setup Flask-Admin
 admin = Admin(app, name='Time of Need Admin', template_mode='bootstrap3',
               base_template='my_master.html')
-admin.add_view(MyModelView(Location, db.session, name="Locations"))
+admin.add_view(LocationModelView(Location, db.session, name="Locations"))
 
 
 # Define a context processor for merging flask-admin's template context into
