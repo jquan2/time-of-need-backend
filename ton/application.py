@@ -58,6 +58,7 @@ class LocationModelView(SecureView):
     _list_columns = ["name", "services"]
     _form_columns = [
         "name",
+        "services",
         "address_line1",
         "address_line2",
         "address_line3",
@@ -69,8 +70,6 @@ class LocationModelView(SecureView):
         "currency",
         "min_cost",
         "days_of_week",
-        "services",
-        "zip_codes",
     ]
 
     can_view_details = True
