@@ -32,15 +32,6 @@ def initialize_db():
         active=True)
     app.db.session.add(admin)
 
-    # Cities
-    fbx = models.City(name="Fairbanks")
-    app.db.session.add(fbx)
-
-    # Zip codes
-    for z in ["99701", "99706", "99707", "99708", "99709", "99710", "99711",
-              "99712", "99775", "99790"]:
-        fbx.zip_codes.append(models.Zipcode(zip=z))
-
     # Days of week
     for day in ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday",
                 "Saturday", "Sunday"]:
@@ -49,6 +40,17 @@ def initialize_db():
     # Currency
     for currency in ["U.S. dollars"]:
         app.db.session.add(models.Currency(currency=currency))
+
+    # Services
+    services = [
+        "Shelter", "Food", "Clothing Closets / Assistance Programs",
+        "Shower Facilities", "Support Groups", "Medical Facilities",
+        "Employment Assistance", "Transportation Assistance",
+        "Suicide Prevention", "Domestic Violence Resources",
+        "Veteran Services", "Referral Services"
+    ]
+    for s in services:
+        app.db.session.add(models.Service(name=s))
 
     # Save
     app.db.session.commit()

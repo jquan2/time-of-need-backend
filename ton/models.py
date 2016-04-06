@@ -42,27 +42,11 @@ locations_services = db.Table(
 )
 
 
-locations_zipcodes = db.Table(
-    'locations_zipcodes',
-    db.Column('location_id', db.Integer, db.ForeignKey('location.id')),
-    db.Column('zipcode_id', db.Integer, db.ForeignKey('zip_code.id'))
-)
-
-
 locations_days_of_week = db.Table(
     'locations_days_of_week',
     db.Column('location_id', db.Integer, db.ForeignKey('location.id')),
     db.Column('day_of_week_id', db.Integer, db.ForeignKey('day_of_week.id'))
 )
-
-
-class City(db.Model):
-    __tablename__ = 'city'
-    id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(80), nullable=False, unique=True)
-
-    def __str__(self):
-        return self.name
 
 
 class Currency(db.Model):
@@ -105,9 +89,6 @@ class Location(db.Model):
     services = db.relationship(
         'Service', secondary=locations_services,
         backref=db.backref('locations', lazy='dynamic'))
-    zip_codes = db.relationship(
-        'Zipcode', secondary=locations_zipcodes,
-        backref=db.backref('locations', lazy='dynamic'))
 
     def __str__(self):
         return self.name
@@ -120,14 +101,3 @@ class Service(db.Model):
 
     def __str__(self):
         return self.name
-
-
-class Zipcode(db.Model):
-    __tablename__ = 'zip_code'
-    id = db.Column(db.Integer, primary_key=True)
-    zip = db.Column(db.String(5), nullable=False, unique=True)
-    city_id = db.Column(db.Integer, db.ForeignKey('city.id'))
-    city = db.relationship("City", backref="zip_codes")
-
-    def __str__(self):
-        return self.zip

@@ -17,14 +17,6 @@ class GetLocationsResource(Resource):
                 "name": location.name,
             }
 
-            if location.zip_codes is not None:
-                zipcodes_json = []
-                for zip in location.zip_codes:
-                    zipcodes_json.append(str(zip))
-
-                if len(zipcodes_json) > 0:
-                    loc["zipcodes"] = zipcodes_json
-
             if location.services is not None:
                 services_json = []
                 for service in location.services:
@@ -68,8 +60,9 @@ class GetLocationsResource(Resource):
             locations_json.append(loc)
 
         return ({
-            "locations" : locations_json
+            "locations": locations_json
         }, 200)
+
 
 class TestResource(Resource):
     def get(self):
