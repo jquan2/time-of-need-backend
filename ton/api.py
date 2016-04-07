@@ -33,6 +33,9 @@ class GetLocationsResource(Resource):
                 if len(days_of_week_json) > 0:
                     loc["days"] = days_of_week_json
 
+            if location.description is not None:
+                loc["description"] = str(location.description)
+
             if location.address_line1 is not None:
                 loc["address_line1"] = str(location.address_line1)
 
