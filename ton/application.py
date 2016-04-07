@@ -68,8 +68,6 @@ class LocationModelView(SecureView):
         "website",
         "opening_time",
         "closing_time",
-        "currency",
-        "min_cost",
         "days_of_week",
     ]
 
