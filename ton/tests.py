@@ -1,10 +1,11 @@
 """All tests"""
+import datetime
 import json
 import os
 
 from ton import application
 from ton.api import GetLocationsResource
-from ton.models import db, Location
+from ton.models import db, DayOfWeek, Location, Service
 from flask.ext.testing import TestCase
 from flask import url_for
 
@@ -86,3 +87,39 @@ class ApiTests(TonTests):
 
     def test_location_website(self):
         self.validate_api_string_field(db_field='website')
+
+    def test_location_opening_time(self):
+        self.create_location(opening_time=datetime.time(8, 0, 0))
+        j = self.get_json_as_dict()
+        key = "opening_time"
+        expected = "08:00:00"
+        self.assertIn(key, j['locations'][0])
+        self.assertEqual(j['locations'][0][key], expected)
+
+    def test_location_closing_time(self):
+        self.create_location(closing_time=datetime.time(17, 0, 0))
+        j = self.get_json_as_dict()
+        key = "closing_time"
+        expected = "17:00:00"
+        self.assertIn(key, j['locations'][0])
+        self.assertEqual(j['locations'][0][key], expected)
+
+    def test_location_days_of_week(self):
+        loc = self.create_location()
+        loc.days_of_week.append(DayOfWeek(day="Fooday"))
+        loc.days_of_week.append(DayOfWeek(day="Barday"))
+        j = self.get_json_as_dict()
+        key = "days"
+        expected = ["Fooday", "Barday"]
+        self.assertIn(key, j['locations'][0])
+        self.assertEqual(j['locations'][0][key], expected)
+
+    def test_location_services(self):
+        loc = self.create_location()
+        loc.services.append(Service(name="Fooservice"))
+        loc.services.append(Service(name="Barservice"))
+        j = self.get_json_as_dict()
+        key = "services"
+        expected = ["Fooservice", "Barservice"]
+        self.assertIn(key, j['locations'][0])
+        self.assertEqual(j['locations'][0][key], expected)
