@@ -8,6 +8,7 @@ from ton.api import GetLocationsResource
 from ton.models import db, DayOfWeek, Location, Service
 from flask.ext.testing import TestCase
 from flask import url_for
+from flask_sqlalchemy import sqlalchemy
 
 
 class TonTests(TestCase):
@@ -123,3 +124,9 @@ class ApiTests(TonTests):
         expected = ["Fooservice", "Barservice"]
         self.assertIn(key, j['locations'][0])
         self.assertEqual(j['locations'][0][key], expected)
+
+
+    def test_location_empty_name(self):
+        with self.assertRaises(sqlalchemy.exc.IntegrityError):
+            loc = self.create_location(name=None)
+            j = self.get_json_as_dict()
