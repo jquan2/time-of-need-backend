@@ -44,6 +44,15 @@ class StatusTests(TonTests):
         self.assertRedirects(r, expected)
 
 
+class ModelTests(TonTests):
+    def test_location_required_name(self):
+        """Ensure that 'name' is a required location field"""
+        with self.assertRaises(sqlalchemy.exc.IntegrityError):
+            loc = Location(name=None)
+            db.session.add(loc)
+            db.session.flush()
+
+
 class ApiTests(TonTests):
     # Helpers
     def create_location(self, name="Default name", **kwargs):
@@ -129,12 +138,6 @@ class ApiTests(TonTests):
         expected = ["Fooservice", "Barservice"]
         self.assertIn(key, j['locations'][0])
         self.assertEqual(j['locations'][0][key], expected)
-
-
-    def test_location_empty_name(self):
-        with self.assertRaises(sqlalchemy.exc.IntegrityError):
-            loc = self.create_location(name=None)
-            j = self.get_json_as_dict()
 
     def test_location_empty_description(self):
         self.validate_api_empty_string_field("description")
