@@ -64,6 +64,12 @@ class ApiTests(TonTests):
         self.assertIn(key, j['locations'][0])
         self.assertEqual(j['locations'][0][key], expected)
 
+    def validate_api_empty_string_field(self, json_field):
+        loc = self.create_location()
+        j = self.get_json_as_dict()
+        self.assertNotIn(json_field, j['locations'][0])
+
+
     # Tests
     def test_location_name(self):
         self.validate_api_string_field(db_field='name')
@@ -130,3 +136,42 @@ class ApiTests(TonTests):
         with self.assertRaises(sqlalchemy.exc.IntegrityError):
             loc = self.create_location(name=None)
             j = self.get_json_as_dict()
+
+    def test_location_empty_description(self):
+        self.validate_api_empty_string_field("description")
+    
+    def test_location_empty_address_line1(self):
+        self.validate_api_empty_string_field("address_line1")
+
+    def test_location_empty_address_line2(self):
+        self.validate_api_empty_string_field("address_line2")
+    
+    def test_location_empty_address_line3(self):
+        self.validate_api_empty_string_field("address_line3")
+    
+    def test_location_empty_phone(self):
+        self.validate_api_empty_string_field("phone")
+    
+    def test_location_empty_contact_email(self):
+        self.validate_api_empty_string_field("contact_email")
+    
+    def test_location_empty_website(self):
+        self.validate_api_empty_string_field("website")
+    
+    def test_location_empty_opening_time(self):
+        self.validate_api_empty_string_field("opening_time")
+    
+    def test_location_empty_closing_time(self):
+        self.validate_api_empty_string_field("closing time")
+    
+    def test_location_empty_days_of_week(self):
+        db.session.add(DayOfWeek(day="FooDay"))
+        db.session.add(DayOfWeek(day="FooDat"))
+        self.validate_api_empty_string_field("days_of_week")
+    
+    def test_location_empty_services(self):
+        db.session.add(Service(name="BarService"))
+        db.session.add(Service(name="FooService"))
+        self.validate_api_empty_string_field("services")
+    
+
