@@ -32,6 +32,8 @@ class TonTests(TestCase):
 
 
 class StatusTests(TonTests):
+    """These tests are sanity checks.  The framework shouldn't need testing."""
+
     def test_get_index(self):
         r = self.client.get("/")
         self.assert200(r)
