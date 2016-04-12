@@ -1,13 +1,17 @@
 """All tests"""
+import datetime
+import json
 import os
 
 from ton import application
-from ton.models import db
+from ton.api import GetLocationsResource
+from ton.models import db, DayOfWeek, Location, Service
 from flask.ext.testing import TestCase
 from flask import url_for
+from flask_sqlalchemy import sqlalchemy
 
 
-class StatusTest(TestCase):
+class TonTests(TestCase):
     def setUp(self):
         _cwd = os.path.realpath(os.path.dirname(__file__))
         project_root = os.path.dirname(_cwd)  # Go up one dir
@@ -26,6 +30,10 @@ class StatusTest(TestCase):
         app.config['TESTING'] = True
         return app
 
+
+class StatusTests(TonTests):
+    """These tests are sanity checks.  The framework shouldn't need testing."""
+
     def test_get_index(self):
         r = self.client.get("/")
         self.assert200(r)
@@ -36,3 +44,136 @@ class StatusTest(TestCase):
                            next=url_for("location.index_view",
                                         _external=True))
         self.assertRedirects(r, expected)
+
+
+class ModelTests(TonTests):
+    def test_location_required_name(self):
+        """Ensure that 'name' is a required location field"""
+        with self.assertRaises(sqlalchemy.exc.IntegrityError):
+            loc = Location(name=None)
+            db.session.add(loc)
+            db.session.flush()
+
+
+class ApiTests(TonTests):
+    # Helpers
+    def create_location(self, name="Default name", **kwargs):
+        loc = Location(name=name, **kwargs)
+        db.session.add(loc)
+        return loc
+
+    def get_json_as_dict(self):
+        r = self.client.get(self.app.api.url_for(GetLocationsResource))
+        return json.loads(r.data.decode('utf-8'))
+
+    def validate_api_string_field(self, db_field, json_field=None):
+        """Create Location, get resource, parse json, assert."""
+        expected = "xyzzy"
+        self.create_location(**{db_field: expected})
+        j = self.get_json_as_dict()
+        key = json_field or db_field
+        self.assertIn(key, j['locations'][0])
+        self.assertEqual(j['locations'][0][key], expected)
+
+    def validate_api_empty_string_field(self, json_field):
+        self.create_location()
+        j = self.get_json_as_dict()
+        self.assertNotIn(json_field, j['locations'][0])
+
+    # Tests
+    def test_location_name(self):
+        self.validate_api_string_field(db_field='name')
+
+    def test_location_description(self):
+        self.validate_api_string_field(db_field='description')
+
+    def test_location_address_line1(self):
+        self.validate_api_string_field(db_field='address_line1')
+
+    def test_location_address_line2(self):
+        self.validate_api_string_field(db_field='address_line2')
+
+    def test_location_address_line3(self):
+        self.validate_api_string_field(db_field='address_line3')
+
+    def test_location_phone(self):
+        self.validate_api_string_field(db_field='phone')
+
+    def test_location_contact_email(self):
+        self.validate_api_string_field(db_field='contact_email')
+
+    def test_location_website(self):
+        self.validate_api_string_field(db_field='website')
+
+    def test_location_opening_time(self):
+        self.create_location(opening_time=datetime.time(8, 0, 0))
+        j = self.get_json_as_dict()
+        key = "opening_time"
+        expected = "08:00:00"
+        self.assertIn(key, j['locations'][0])
+        self.assertEqual(j['locations'][0][key], expected)
+
+    def test_location_closing_time(self):
+        self.create_location(closing_time=datetime.time(17, 0, 0))
+        j = self.get_json_as_dict()
+        key = "closing_time"
+        expected = "17:00:00"
+        self.assertIn(key, j['locations'][0])
+        self.assertEqual(j['locations'][0][key], expected)
+
+    def test_location_days_of_week(self):
+        loc = self.create_location()
+        loc.days_of_week.append(DayOfWeek(day="Fooday"))
+        loc.days_of_week.append(DayOfWeek(day="Barday"))
+        j = self.get_json_as_dict()
+        key = "days"
+        expected = ["Fooday", "Barday"]
+        self.assertIn(key, j['locations'][0])
+        self.assertEqual(j['locations'][0][key], expected)
+
+    def test_location_services(self):
+        loc = self.create_location()
+        loc.services.append(Service(name="Fooservice"))
+        loc.services.append(Service(name="Barservice"))
+        j = self.get_json_as_dict()
+        key = "services"
+        expected = ["Fooservice", "Barservice"]
+        self.assertIn(key, j['locations'][0])
+        self.assertEqual(j['locations'][0][key], expected)
+
+    def test_location_empty_description(self):
+        self.validate_api_empty_string_field("description")
+
+    def test_location_empty_address_line1(self):
+        self.validate_api_empty_string_field("address_line1")
+
+    def test_location_empty_address_line2(self):
+        self.validate_api_empty_string_field("address_line2")
+
+    def test_location_empty_address_line3(self):
+        self.validate_api_empty_string_field("address_line3")
+
+    def test_location_empty_phone(self):
+        self.validate_api_empty_string_field("phone")
+
+    def test_location_empty_contact_email(self):
+        self.validate_api_empty_string_field("contact_email")
+
+    def test_location_empty_website(self):
+        self.validate_api_empty_string_field("website")
+
+    def test_location_empty_opening_time(self):
+        self.validate_api_empty_string_field("opening_time")
+
+    def test_location_empty_closing_time(self):
+        self.validate_api_empty_string_field("closing time")
+
+    def test_location_empty_days_of_week(self):
+        db.session.add(DayOfWeek(day="FooDay"))
+        db.session.add(DayOfWeek(day="FooDat"))
+        self.validate_api_empty_string_field("days_of_week")
+
+    def test_location_empty_services(self):
+        db.session.add(Service(name="BarService"))
+        db.session.add(Service(name="FooService"))
+        self.validate_api_empty_string_field("services")
