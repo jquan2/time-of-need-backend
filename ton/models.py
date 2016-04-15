@@ -1,6 +1,8 @@
 from flask_security import RoleMixin, UserMixin
 
-from flask_sqlalchemy import SQLAlchemy
+from flask_sqlalchemy import SQLAlchemy, event
+from sqlalchemy.orm.session import Session as SessionBase
+from sqlalchemy.sql import func as sql_func
 
 db = SQLAlchemy()
 
@@ -49,7 +51,24 @@ locations_days_of_week = db.Table(
 )
 
 
-class DayOfWeek(db.Model):
+class LastUpdate(db.Model):
+    __tablename__ = 'last_update'
+    id = db.Column(db.Integer, primary_key=True)
+    last_update = db.Column(db.DateTime, nullable=False)
+
+    def __str__(self):
+        return self.day
+
+
+class ChangeTrackingModel(db.Model):
+    __abstract__ = True
+    created = db.Column(db.DateTime, nullable=False,
+        server_default=sql_func.current_timestamp())  # noqa
+    updated = db.Column(db.DateTime, nullable=False,
+        server_default=sql_func.current_timestamp())  # noqa
+
+
+class DayOfWeek(ChangeTrackingModel):
     __tablename__ = 'day_of_week'
     id = db.Column(db.Integer, primary_key=True)
     day = db.Column(db.String(10), nullable=False, unique=True)
@@ -58,7 +77,7 @@ class DayOfWeek(db.Model):
         return self.day
 
 
-class Location(db.Model):
+class Location(ChangeTrackingModel):
     __tablename__ = 'location'
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(80), nullable=False, unique=True)
@@ -82,10 +101,17 @@ class Location(db.Model):
         return self.name
 
 
-class Service(db.Model):
+class Service(ChangeTrackingModel):
     __tablename__ = 'service'
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(40), nullable=False, unique=True)
 
     def __str__(self):
         return self.name
+
+
+@event.listens_for(SessionBase, 'before_flush')
+def receive_before_flush(session, flush_context, instances):
+    """Update the data version before every flush"""
+    db.session.query(LastUpdate).delete()
+    db.session.add(LastUpdate(last_update=sql_func.current_timestamp()))
