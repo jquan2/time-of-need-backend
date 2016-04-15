@@ -1,9 +1,7 @@
 from flask.ext.restful import Resource
 
-from sqlalchemy import func
-
 from .application import app
-from .models import User, Location
+from .models import Location
 
 
 class GetLocationsResource(Resource):
@@ -67,14 +65,5 @@ class GetLocationsResource(Resource):
         }, 200)
 
 
-class TestResource(Resource):
-    def get(self):
-        return ({
-            'message': 'ok',
-            'user_count': app.db.session.query(func.count(User.id)).scalar()
-        }, 200)
-
-
 def api_initialize():
-    app.api.add_resource(TestResource, '/api/test')
     app.api.add_resource(GetLocationsResource, '/api/getlocations')
