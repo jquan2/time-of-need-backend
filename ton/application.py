@@ -29,22 +29,21 @@ user_datastore = SQLAlchemyUserDatastore(app.db, User, Role)
 security = Security(app, user_datastore)
 
 
-# Create customized model view class
+# Setup Flask-Security
+user_datastore = SQLAlchemyUserDatastore(app.db, User, Role)
+security = Security(app, user_datastore)
+
+
+# Create customized model view classes
 class SecureView(sqla.ModelView):
     def is_accessible(self):
-        if not current_user.is_active or not current_user.is_authenticated:
-            return False
-
-        if current_user.has_role('Administrator'):
-            return True
-
-        return False
+        """Deny access if current_user isn't a logged-in admin"""
+        return (current_user.is_active and
+                current_user.is_authenticated and
+                current_user.has_role('Administrator'))
 
     def _handle_view(self, name, **kwargs):
-        """
-        Override builtin _handle_view in order to redirect users when a view
-        is not accessible.
-        """
+        """Redirect users when a view is not accessible"""
         if not self.is_accessible():
             if current_user.is_authenticated:
                 # permission denied
