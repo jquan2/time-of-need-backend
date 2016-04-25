@@ -57,23 +57,24 @@ class SecureView(sqla.ModelView):
 class LocationModelView(SecureView):
     _list_columns = ["name", "services"]
     _form_columns = [
-        "name",
-        "services",
-        "description",
-        "address_line1",
-        "address_line2",
-        "address_line3",
-        "phone",
-        "contact_email",
-        "website",
-        "opening_time",
-        "closing_time",
-        "days_of_week",
+        ("name", "e.g. Food Bank of Alaska"),
+        ("services", "Click for drop-down choices. May select multiple "
+            "services. Type to filter."),
+        ("description", ""),
+        ("address_line1", "e.g. 123 Main St."),
+        ("address_line2", "e.g. Ste. 200"),
+        ("address_line3", "e.g. Fairbanks, AK 99775"),
+        ("phone", "e.g. xxx-xxx-xxxx"),
+        ("contact_email", "e.g. example@email.com"),
+        ("website", "e.g. wehelppeople.org or www.wehelppeople.org"),
+        ("opening_time", "Useful for locations with regular hours."),
+        ("closing_time", "Useful for locations with regular hours."),
+        ("days_of_week", "Useful for locations with regular hours."),
     ]
-
-    can_view_details = True
+    can_view_details = True  # Add a "View" option for records
     column_list = _list_columns  # List view
-    form_columns = _form_columns  # Form view
+    form_columns = [name for name, _ in _form_columns]  # Form view
+    column_descriptions = dict(_form_columns)  # Form view
 
 
 # Setup Flask-Admin
