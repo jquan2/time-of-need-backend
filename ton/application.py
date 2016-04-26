@@ -29,11 +29,6 @@ user_datastore = SQLAlchemyUserDatastore(app.db, User, Role)
 security = Security(app, user_datastore)
 
 
-# Setup Flask-Security
-user_datastore = SQLAlchemyUserDatastore(app.db, User, Role)
-security = Security(app, user_datastore)
-
-
 # Create customized model view classes
 class SecureView(sqla.ModelView):
     def is_accessible(self):
