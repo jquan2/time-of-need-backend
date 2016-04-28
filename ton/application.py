@@ -50,7 +50,7 @@ class SecureView(sqla.ModelView):
 
 class LocationModelView(SecureView):
     _list_columns = ["name", "services", "city", "state"]
-    _form_columns = [
+    _cols = [
         ("name", "e.g. Food Bank of Alaska"),
         ("services", "Click for drop-down choices. May select multiple "
             "services. Type to filter."),
@@ -67,12 +67,13 @@ class LocationModelView(SecureView):
         ("city", "Useful for sorting locations.  Not sent to mobile devices."),
         ("state", "Useful for sorting locations.  Not sent to mobile devices."),
     ]
-    can_view_details = True  # Add a "View" option for records
-    column_list = _list_columns  # List view
+    can_view_details = True
+    column_details_list = [name for name, _ in _cols]
     column_default_sort = "name"
-    column_details_list = [name for name, _ in _form_columns]
-    form_columns = [name for name, _ in _form_columns]  # Form view
-    column_descriptions = dict(_form_columns)  # Form view
+    column_descriptions = dict(_cols)
+    column_editable_list = ["city", "state"]
+    column_list = _list_columns  # List view only
+    form_columns = [name for name, _ in _cols if name not in ["city", "state"]]
 
 
 # Setup Flask-Admin
