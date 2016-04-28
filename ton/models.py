@@ -90,6 +90,8 @@ class Location(ChangeTrackingModel):
     website = db.Column(db.String(256))
     opening_time = db.Column(db.Time)
     closing_time = db.Column(db.Time)
+    city = db.Column(db.String(80))
+    state = db.Column(db.String(80))
     days_of_week = db.relationship(
         'DayOfWeek', secondary=locations_days_of_week,
         backref=db.backref('locations', lazy='dynamic'))

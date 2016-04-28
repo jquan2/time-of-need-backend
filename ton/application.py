@@ -49,7 +49,7 @@ class SecureView(sqla.ModelView):
 
 
 class LocationModelView(SecureView):
-    _list_columns = ["name", "services"]
+    _list_columns = ["name", "services", "city", "state"]
     _form_columns = [
         ("name", "e.g. Food Bank of Alaska"),
         ("services", "Click for drop-down choices. May select multiple "
@@ -64,6 +64,8 @@ class LocationModelView(SecureView):
         ("opening_time", "Useful for locations with regular hours."),
         ("closing_time", "Useful for locations with regular hours."),
         ("days_of_week", "Useful for locations with regular hours."),
+        ("city", "Useful for sorting locations.  Not sent to mobile devices."),
+        ("state", "Useful for sorting locations.  Not sent to mobile devices."),
     ]
     can_view_details = True  # Add a "View" option for records
     column_list = _list_columns  # List view
