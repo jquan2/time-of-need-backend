@@ -69,6 +69,7 @@ class LocationModelView(SecureView):
     ]
     can_view_details = True  # Add a "View" option for records
     column_list = _list_columns  # List view
+    column_default_sort = "name"
     form_columns = [name for name, _ in _form_columns]  # Form view
     column_descriptions = dict(_form_columns)  # Form view
 
