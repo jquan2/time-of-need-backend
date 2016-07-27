@@ -67,6 +67,7 @@ class StandardFilteredView(sqla.ModelView):
 
         if current_user.has_role('Standard') and not current_user.has_role('Administrator'):
             self.can_create = False
+            self.can_delete = False
 
     # Given a location id, are we allowed to edit it?
     def is_owned(self, id):
@@ -102,7 +103,7 @@ class StandardFilteredView(sqla.ModelView):
 
     def get_count_query(self):
         if current_user.has_role('Administrator'):
-            return super(self).get_count_query()
+            return super(StandardFilteredView, self).get_count_query()
         elif current_user.has_role('Standard'):
             allowed_locations = [location.id for location in current_user.locations]
             return super(StandardFilteredView, self).get_count_query().filter(self.model.id.in_(allowed_locations))
