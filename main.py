@@ -24,6 +24,8 @@ def initialize_db():
     # Add roles
     admin_role = models.Role(name='Administrator')
     app.db.session.add(admin_role)
+    standard_role = models.Role(name='Standard')
+    app.db.session.add(standard_role)
     admin = models.User(
         username='admin',
         email='admin@example.com',

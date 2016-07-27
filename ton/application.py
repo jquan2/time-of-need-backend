@@ -48,7 +48,67 @@ class SecureView(sqla.ModelView):
                 return redirect(url_for('security.login', next=request.url))
 
 
-class LocationModelView(SecureView):
+class StandardFilteredView(sqla.ModelView):
+    def is_accessible(self):
+        """Deny access if current_user isn't a logged-in admin"""
+        return (current_user.is_active and
+                current_user.is_authenticated and
+                (current_user.has_role('Administrator') or current_user.has_role('Standard')))
+
+    def _handle_view(self, name, **kwargs):
+        """Redirect users when a view is not accessible"""
+        if not self.is_accessible():
+            if current_user.is_authenticated:
+                # permission denied
+                abort(403)
+            else:
+                # login
+                return redirect(url_for('security.login', next=request.url))
+
+        if current_user.has_role('Standard') and not current_user.has_role('Administrator'):
+            self.can_create = False
+
+    # Given a location id, are we allowed to edit it?
+    def is_owned(self, id):
+        if current_user.has_role('Administrator'):
+            return True
+        allowed_locations = [location.id for location in current_user.locations]
+        if int(id) in allowed_locations:
+            return True
+        else:
+            return False
+
+    # Overrides to check model ownership
+    def on_model_change(self, form, model, is_created):
+        if not self.is_owned(model.id):
+            abort(403)
+
+    def on_form_prefill(self, form, id):
+        if not self.is_owned(id):
+            abort(403)
+
+    def on_model_delete(self, model):
+        if not self.is_owned(model.id):
+            abort(403)
+
+    # Query Overrides to limit Standard Users to Locations they Own
+
+    def get_query(self):
+        allowed_locations = [location.id for location in current_user.locations]
+        if current_user.has_role('Standard') and not current_user.has_role('Administrator'):
+            return self.session.query(self.model).filter(self.model.id.in_(allowed_locations))
+        elif current_user.has_role('Administrator'):
+            return self.session.query(self.model)
+
+    def get_count_query(self):
+        if current_user.has_role('Administrator'):
+            return super(self).get_count_query()
+        elif current_user.has_role('Standard'):
+            allowed_locations = [location.id for location in current_user.locations]
+            return super(StandardFilteredView, self).get_count_query().filter(self.model.id.in_(allowed_locations))
+
+
+class LocationModelView(StandardFilteredView):
     _list_columns = ["name", "services", "city", "state"]
     _cols = [
         ("name", "e.g. Food Bank of Alaska"),
@@ -76,11 +136,25 @@ class LocationModelView(SecureView):
     form_columns = [name for name, _ in _cols if name not in ["city", "state"]]
 
 
+class UserModelView(SecureView):
+    _cols = [
+        ("username", "Account Name"),
+        ("roles", "User Permissions"),
+        ("locations", "Locations Standard user is allowed to edit"),
+        ("email", "User Email Address"),
+        ("password", "User Password"),
+        ("active", "Is User Enabled?"),
+    ]
+    column_default_sort = "username"
+    column_descriptions = dict(_cols)
+    column_exclude_list = ['password', ]
+
+
 # Setup Flask-Admin
 admin = Admin(app, name='Time of Need Admin', template_mode='bootstrap3',
               base_template='my_master.html')
 admin.add_view(LocationModelView(Location, db.session, name="Locations"))
-
+admin.add_view(UserModelView(User, db.session, name="Users"))
 
 # Define a context processor for merging flask-admin's template context into
 # the flask-security views.

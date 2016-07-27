@@ -14,6 +14,28 @@ roles_users = db.Table(
 )
 
 
+# Data tables
+locations_services = db.Table(
+    'locations_services',
+    db.Column('location_id', db.Integer, db.ForeignKey('location.id')),
+    db.Column('service_id', db.Integer, db.ForeignKey('service.id'))
+)
+
+
+locations_days_of_week = db.Table(
+    'locations_days_of_week',
+    db.Column('location_id', db.Integer, db.ForeignKey('location.id')),
+    db.Column('day_of_week_id', db.Integer, db.ForeignKey('day_of_week.id'))
+)
+
+
+users_locations = db.Table(
+    'users_locations',
+    db.Column('user_id', db.Integer, db.ForeignKey('user.id')),
+    db.Column('location_id', db.Integer, db.ForeignKey('location.id'))
+)
+
+
 class Role(db.Model, RoleMixin):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(80), unique=True)
@@ -31,24 +53,11 @@ class User(db.Model, UserMixin):
     active = db.Column(db.Boolean)
     roles = db.relationship('Role', secondary=roles_users,
                             backref=db.backref('users', lazy='dynamic'))
+    locations = db.relationship('Location', secondary=users_locations,
+                                backref=db.backref('users', lazy='dynamic'))
 
     def __str__(self):
         return self.email
-
-
-# Data tables
-locations_services = db.Table(
-    'locations_services',
-    db.Column('location_id', db.Integer, db.ForeignKey('location.id')),
-    db.Column('service_id', db.Integer, db.ForeignKey('service.id'))
-)
-
-
-locations_days_of_week = db.Table(
-    'locations_days_of_week',
-    db.Column('location_id', db.Integer, db.ForeignKey('location.id')),
-    db.Column('day_of_week_id', db.Integer, db.ForeignKey('day_of_week.id'))
-)
 
 
 class LastUpdate(db.Model):
