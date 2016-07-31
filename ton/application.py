@@ -65,9 +65,7 @@ class StandardFilteredView(sqla.ModelView):
                 # login
                 return redirect(url_for('security.login', next=request.url))
 
-        if current_user.has_role('Standard') and not current_user.has_role('Administrator'):
-            self.can_create = False
-            self.can_delete = False
+        self.can_create = self.can_delete = current_user.has_role('Administrator')
 
     # Given a location id, are we allowed to edit it?
     def is_owned(self, id):
