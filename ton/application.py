@@ -72,10 +72,7 @@ class StandardFilteredView(sqla.ModelView):
         if current_user.has_role('Administrator'):
             return True
         allowed_locations = [location.id for location in current_user.locations]
-        if int(id) in allowed_locations:
-            return True
-        else:
-            return False
+        return int(id) in allowed_locations
 
     # Overrides to check model ownership
     def on_model_change(self, form, model, is_created):
