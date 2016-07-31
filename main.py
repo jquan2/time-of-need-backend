@@ -1,9 +1,11 @@
+import datetime
 import os
+import shutil
 from subprocess import call
 
 from flask.ext.script import Manager, Server
 
-from ton import models
+from ton import config, models
 from ton.application import app
 
 manager = Manager(app)
@@ -17,6 +19,12 @@ server = Server(
 
 @manager.command
 def initialize_db():
+    # Move existing SQLite database out of the way
+    if os.path.isfile(config.DATABASE_PATH):
+        ext = datetime.datetime.now().strftime("%Y%m%d%H%M%S")
+        new_path = "{path}.{ext}".format(path=config.DATABASE_PATH, ext=ext)
+        shutil.move(config.DATABASE_PATH, new_path)
+
     # Flush the database
     app.db.drop_all()
     app.db.create_all()

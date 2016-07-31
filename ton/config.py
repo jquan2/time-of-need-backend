@@ -1,4 +1,9 @@
-SQLALCHEMY_DATABASE_URI = 'sqlite:///../local.db'
+import os
+
+DATABASE_DIR = os.path.dirname(os.path.dirname(os.path.realpath(__file__)))
+DATABASE_FILE = "local.db"
+DATABASE_PATH = os.path.join(DATABASE_DIR, DATABASE_FILE)
+SQLALCHEMY_DATABASE_URI = 'sqlite:///{db_path}'.format(db_path=DATABASE_PATH)
 
 SECRET_KEY = '384509348'
 
