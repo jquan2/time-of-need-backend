@@ -1,7 +1,9 @@
 <html>
     <body>
-        <div>
-            <a href="{{ url_for('admin.index') }}">Flask Admin!</a>
-        </div>
+        <script>
+            window.location='/admin/';
+        </script>
+        Redirecting to <a href='/admin/'>/admin/</a>
+        <meta http-equiv="refresh" content="1;URL=/admin/">
     </body>
 </html>
