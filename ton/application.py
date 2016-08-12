@@ -1,4 +1,4 @@
-from flask import Flask, abort, redirect, render_template, request, url_for
+from flask import Flask, abort, flash, redirect, render_template, request, url_for  # noqa
 from flask.ext import restful
 from flask_admin import Admin
 from flask_admin import helpers as admin_helpers
@@ -6,6 +6,7 @@ from flask_admin.contrib import sqla
 from flask_security import SQLAlchemyUserDatastore, Security, current_user
 from flask_security.utils import encrypt_password
 from wtforms.fields import PasswordField
+
 
 from .models import Location, Role, User, db
 
@@ -27,6 +28,18 @@ def index():
 # Setup Flask-Security
 user_datastore = SQLAlchemyUserDatastore(app.db, User, Role)
 security = Security(app, user_datastore)
+
+
+class PasswordNotGivenError(ValueError):
+    pass
+
+
+class PasswordCompareError(ValueError):
+    pass
+
+
+class BorkCurrentUserError(ValueError):
+    pass
 
 
 # Create customized model view classes
@@ -140,27 +153,54 @@ class UserModelView(SecureView):
         ("username", "Account Name"),
         ("roles", "User Permissions"),
         ("locations", "Locations Standard user is allowed to edit"),
-        ("email", "User Email Address"),
+        ("email", "Email Address (used for login)"),
         ("password", "User Password"),
-        ("active", "Is User Enabled?"),
+        ("active", "Is login permitted?"),
     ]
     column_default_sort = "username"
     column_descriptions = dict(_cols)
 
     # Sub in a non-db-backed field for passwords
-    column_descriptions["new_password"] = "Enter new password here to change password"  # noqa
+    column_descriptions["new_password"] = "Enter new password here"
+    column_descriptions["confirm_password"] = "Confirm new password"
     column_exclude_list = form_excluded_columns = ['password', ]
 
     def scaffold_form(self):
         """Add new_password field to form"""
         form_class = super(UserModelView, self).scaffold_form()
         form_class.new_password = PasswordField('New Password')
+        form_class.confirm_password = PasswordField('Confirm Password')
         return form_class
 
     def on_model_change(self, form, model, is_created):
-        """Use new_password field for password changes"""
+        """Use new_password field.  Block self-deactivation."""
+        if is_created and not model.new_password:
+            raise PasswordNotGivenError("You must give new users a password.")
+
+        if model == current_user and not model.active:
+            raise BorkCurrentUserError("You may not deactivate your own account.")  # noqa
         if model.new_password:
-            model.password = encrypt_password(model.new_password)
+            if model.new_password == model.confirm_password:
+                model.password = encrypt_password(model.new_password)
+            else:
+                raise PasswordCompareError("Passwords do not match.")
+
+    def on_model_delete(self, model):
+        """Block self-deletion"""
+        if model == current_user:
+            raise BorkCurrentUserError("You may not delete your own account.")
+
+    def handle_view_exception(self, exc):
+        validation_exceptions = [
+            PasswordNotGivenError,
+            PasswordCompareError,
+            BorkCurrentUserError,
+        ]
+        for e in validation_exceptions:
+            if isinstance(exc, e):
+                flash(str(exc), 'error')
+                return True
+        return super(UserModelView, self).handle_view_exception(exc)
 
 
 # Setup Flask-Admin
