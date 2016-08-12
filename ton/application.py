@@ -4,6 +4,8 @@ from flask_admin import Admin
 from flask_admin import helpers as admin_helpers
 from flask_admin.contrib import sqla
 from flask_security import SQLAlchemyUserDatastore, Security, current_user
+from flask_security.utils import encrypt_password
+from wtforms.fields import PasswordField
 
 from .models import Location, Role, User, db
 
@@ -144,7 +146,21 @@ class UserModelView(SecureView):
     ]
     column_default_sort = "username"
     column_descriptions = dict(_cols)
-    column_exclude_list = ['password', ]
+
+    # Sub in a non-db-backed field for passwords
+    column_descriptions["new_password"] = "Enter new password here to change password"  # noqa
+    column_exclude_list = form_excluded_columns = ['password', ]
+
+    def scaffold_form(self):
+        """Add new_password field to form"""
+        form_class = super(UserModelView, self).scaffold_form()
+        form_class.new_password = PasswordField('New Password')
+        return form_class
+
+    def on_model_change(self, form, model, is_created):
+        """Use new_password field for password changes"""
+        if model.new_password:
+            model.password = encrypt_password(model.new_password)
 
 
 # Setup Flask-Admin
