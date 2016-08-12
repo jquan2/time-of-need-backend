@@ -1,10 +1,8 @@
 from flask import Flask, abort, redirect, render_template, request, url_for
 from flask.ext import restful
-
 from flask_admin import Admin
 from flask_admin import helpers as admin_helpers
 from flask_admin.contrib import sqla
-
 from flask_security import SQLAlchemyUserDatastore, Security, current_user
 
 from .models import Location, Role, User, db
@@ -16,7 +14,7 @@ app.db = db
 
 # Setup api
 app.api = restful.Api(app)
-from .api import api_initialize
+from .api import api_initialize  # noqa
 api_initialize()
 
 
@@ -52,8 +50,9 @@ class StandardFilteredView(sqla.ModelView):
     def is_accessible(self):
         """Deny access if current_user isn't a logged-in admin"""
         return (current_user.is_active and
-                current_user.is_authenticated and
-                (current_user.has_role('Administrator') or current_user.has_role('Standard')))
+                current_user.is_authenticated and (
+                    current_user.has_role('Administrator') or
+                    current_user.has_role('Standard')))
 
     def _handle_view(self, name, **kwargs):
         """Redirect users when a view is not accessible"""
@@ -65,7 +64,7 @@ class StandardFilteredView(sqla.ModelView):
                 # login
                 return redirect(url_for('security.login', next=request.url))
 
-        self.can_create = self.can_delete = current_user.has_role('Administrator')
+        self.can_create = self.can_delete = current_user.has_role('Administrator')  # noqa
 
     # Given a location id, are we allowed to edit it?
     def is_owned(self, id):
@@ -91,17 +90,19 @@ class StandardFilteredView(sqla.ModelView):
 
     def get_query(self):
         allowed_locations = [location.id for location in current_user.locations]
-        if current_user.has_role('Standard') and not current_user.has_role('Administrator'):
-            return self.session.query(self.model).filter(self.model.id.in_(allowed_locations))
-        elif current_user.has_role('Administrator'):
+        if current_user.has_role('Administrator'):
             return self.session.query(self.model)
+        elif current_user.has_role('Standard'):
+            return self.session.query(self.model).filter(
+                self.model.id.in_(allowed_locations))
 
     def get_count_query(self):
+        allowed_locations = [location.id for location in current_user.locations]
         if current_user.has_role('Administrator'):
             return super(StandardFilteredView, self).get_count_query()
         elif current_user.has_role('Standard'):
-            allowed_locations = [location.id for location in current_user.locations]
-            return super(StandardFilteredView, self).get_count_query().filter(self.model.id.in_(allowed_locations))
+            return super(StandardFilteredView, self).get_count_query().filter(
+                self.model.id.in_(allowed_locations))
 
 
 class LocationModelView(StandardFilteredView):
@@ -151,6 +152,7 @@ admin = Admin(app, name='Time of Need Admin', template_mode='bootstrap3',
               base_template='my_master.html')
 admin.add_view(LocationModelView(Location, db.session, name="Locations"))
 admin.add_view(UserModelView(User, db.session, name="Users"))
+
 
 # Define a context processor for merging flask-admin's template context into
 # the flask-security views.
