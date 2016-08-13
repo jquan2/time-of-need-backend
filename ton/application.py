@@ -174,6 +174,10 @@ class UserModelView(SecureView):
 
     def on_model_change(self, form, model, is_created):
         """Use new_password field.  Block self-deactivation."""
+        # This problem already nailed a user.
+        model.username = model.username.strip()
+        model.email = model.email.strip()
+
         if is_created and not model.new_password:
             raise PasswordNotGivenError("You must give new users a password.")
 
